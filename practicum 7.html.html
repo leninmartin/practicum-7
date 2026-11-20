@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neuralnetics — Neuro-Tech & Cybernetic Visual Archive</title>
+  <style>
+    /* 1. Reset & Base Styles */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #050811;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    /* 2. Flexbox Header */
+    .gallery-header {
+      background: linear-gradient(90deg, #090d1e 0%, #0f172a 100%);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+      color: #f8fafc;
+      padding: 1.5rem clamp(1rem, 4vw, 3rem);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .gallery-header h1 {
+      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gallery-header p {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      letter-spacing: 0.03em;
+    }
+
+    /* 3. Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 clamp(1rem, 3vw, 2rem);
+    }
+
+    /* 4. Responsive CSS Grid Layout */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* 5. Gallery Card & Aspect-Ratio Preserving Image */
+    .gallery-item {
+      position: relative;
+      background-color: #0b1120;
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .gallery-item:hover,
+    .gallery-item:focus-visible {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+      box-shadow: 0 12px 28px rgba(56, 189, 248, 0.2);
+      outline: 3px solid #38bdf8;
+      outline-offset: 2px;
+    }
+
+    .gallery-item img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      background-color: #090d16;
+      transition: transform 0.35s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.04);
+    }
+
+    .caption {
+      padding: 0.85rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .caption h2 {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .caption span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #38bdf8;
+      background-color: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* 6. Accessible Flexbox Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background-color: rgba(3, 6, 16, 0.92);
+      backdrop-filter: blur(6px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox-content {
+      position: relative;
+      width: min(92vw, 820px);
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .lightbox-content img {
+      width: 100%;
+      max-height: 75vh;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      object-fit: contain;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+    }
+
+    .lightbox-caption {
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .lb-btn {
+      position: fixed;
+      background-color: rgba(15, 23, 42, 0.75);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .lb-btn:hover {
+      background-color: #38bdf8;
+      color: #050811;
+    }
+
+    .lb-close {
+      top: 1.25rem;
+      right: 1.25rem;
+    }
+
+    .lb-prev {
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .lb-next {
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* 7. Small Mobile Single-Column Refinement */
+    @media (max-width: 480px) {
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="gallery-header">
+    <h1>Neuralnetics: Neuro-Tech Gallery</h1>
+    <p>Brain-Computer Interfaces &bull; Neural Networks &bull; Cybernetics</p>
+  </header>
+
+  <main class="container">
+    <section class="gallery-grid" aria-label="Neuralnetics Systems and Architecture Gallery">
+      <!-- Image 1: Synaptic Lattice -->
+      <figure class="gallery-item" tabindex="0" role="button" aria-label="Open Synaptic Lattice in lightbox">
+        <img
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><defs><radialGradient id='n1' cx='50%25' cy='50%25' r='60%25'><stop offset='0%25' stop-color='%231e1b4b'/><stop offset='100%25' stop-color='%23050811'/></radialGradient></defs><rect width='800' height='600' fill='url(%23n1)'/><g stroke='%2338bdf8' stroke-width='2.5' opacity='0.55'><line x1='160' y1='150' x2='400' y2='290'/><line x1='160' y1='450' x2='400' y2='290'/><line x1='400' y1='290' x2='640' y2='140'/><line x1='400' y1='290' x2='650' y2='440'/><line x1='160' y1='150' x2='390' y2='110'/><line x1='390' y1='110' x2='640' y2='140'/><line x1='160' y1='450' x2='410' y2='490'/><line x1='410' y1='490' x2='650' y2='440'/></g><circle cx='400' cy='290' r='34' fill='%2338bdf8' opacity='0.25'/><circle cx='400' cy='290' r='16' fill='%2338bdf8'/><circle cx='160' cy='150' r='12' fill='%23a855f7'/><circle cx='160' cy='450' r='12' fill='%23a855f7'/><circle cx='640' cy='140' r='12' fill='%2322d3ee'/><circle cx='650' cy='440' r='12' fill='%2322d3ee'/><circle cx='390' cy='110' r='10' fill='%23818cf8'/><circle cx='410' cy='490' r='10' fill='%23818cf8'/></svg>"
+          alt="Interconnected glowing cyan and violet synaptic nodes forming a neural mesh"
+        />
+        <figcaption class="caption">
+          <h2>Synaptic Lattice</h2>
+          <span>Topology</span>
+        </figcaption>
+      </figure>
+
+      <!-- Image 2: Cortical Interface -->
+      <figure class="gallery-item" tabindex="0" role="button" aria-label="Open Cortical Interface in lightbox">
+        <img
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><rect width='800' height='600' fill='%23070b19'/><circle cx='400' cy='300' r='185' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-dasharray='10 8'/><circle cx='400' cy='300' r='135' fill='%23111827' stroke='%2338bdf8' stroke-width='3'/><rect x='345' y='245' width='110' height='110' rx='14' fill='%231e293b' stroke='%2322d3ee' stroke-width='3'/><g stroke='%2338bdf8' stroke-width='2.5'><line x1='365' y1='245' x2='365' y2='205'/><line x1='400' y1='245' x2='400' y2='195'/><line x1='435' y1='245' x2='435' y2='205'/><line x1='365' y1='355' x2='365' y2='395'/><line x1='400' y1='355' x2='400' y2='405'/><line x1='435' y1='355' x2='435' y2='395'/><line x1='345' y1='275' x2='300' y2='275'/><line x1='345' y1='325' x2='300' y2='325'/><line x1='455' y1='275' x2='500' y2='275'/><line x1='455' y1='325' x2='500' y2='325'/></g><circle cx='400' cy='300' r='22' fill='%23a855f7'/></svg>"
+          alt="Micro-electrode cortical implant processor chip surrounded by concentric telemetry rings"
+        />
+        <figcaption class="caption">
+          <h2>Cortical Interface</h2>
+          <span>BCI Core</span>
+        </figcaption>
+      </figure>
+
+      <!-- Image 3: EEG Telemetry -->
+      <figure class="gallery-item" tabindex="0" role="button" aria-label="Open EEG Telemetry in lightbox">
+        <img
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><rect width='800' height='600' fill='%23050a14'/><g stroke='%231e293b' stroke-width='1.5'><line x1='0' y1='150' x2='800' y2='150'/><line x1='0' y1='300' x2='800' y2='300'/><line x1='0' y1='450' x2='800' y2='450'/><line x1='200' y1='0' x2='200' y2='600'/><line x1='400' y1='0' x2='400' y2='600'/><line x1='600' y1='0' x2='600' y2='600'/></g><path d='M0,210 Q100,120 200,210 T400,210 T600,210 T800,210' fill='none' stroke='%2338bdf8' stroke-width='4'/><path d='M0,310 L140,310 L175,215 L215,410 L255,250 L290,310 L480,310 L515,190 L555,425 L595,245 L630,310 L800,310' fill='none' stroke='%2310b981' stroke-width='4'/><path d='M0,430 Q150,370 300,430 T600,430 T800,430' fill='none' stroke='%23a855f7' stroke-width='3.5'/></svg>"
+          alt="Multi-channel neural oscillation waveforms and spike telemetry traces"
+        />
+        <figcaption class="caption">
+          <h2>EEG Telemetry</h2>
+          <span>Bio-Signal</span>
+        </figcaption>
+      </figure>
+
+      <!-- Image 4: Deep Tensor Matrix -->
+      <figure class="gallery-item" tabindex="0" role="button" aria-label="Open Deep Tensor Matrix in lightbox">
+        <img
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><rect width='800' height='600' fill='%23080c1a'/><g stroke='%23475569' stroke-width='1.5'><line x1='180' y1='160' x2='400' y2='130'/><line x1='180' y1='160' x2='400' y2='240'/><line x1='180' y1='300' x2='400' y2='240'/><line x1='180' y1='300' x2='400' y2='360'/><line x1='180' y1='440' x2='400' y2='360'/><line x1='180' y1='440' x2='400' y2='470'/><line x1='400' y1='130' x2='620' y2='220'/><line x1='400' y1='240' x2='620' y2='220'/><line x1='400' y1='240' x2='620' y2='380'/><line x1='400' y1='360' x2='620' y2='380'/><line x1='400' y1='470' x2='620' y2='380'/></g><circle cx='180' cy='160' r='16' fill='%2338bdf8'/><circle cx='180' cy='300' r='16' fill='%2338bdf8'/><circle cx='180' cy='440' r='16' fill='%2338bdf8'/><circle cx='400' cy='130' r='15' fill='%23818cf8'/><circle cx='400' cy='240' r='15' fill='%23818cf8'/><circle cx='400' cy='360' r='15' fill='%23818cf8'/><circle cx='400' cy='470' r='15' fill='%23818cf8'/><circle cx='620' cy='220' r='18' fill='%23f43f5e'/><circle cx='620' cy='380' r='18' fill='%2310b981'/></svg>"
+          alt="Multi-layer deep artificial neural network architecture with weighted pathways"
+        />
+        <figcaption class="caption">
+          <h2>Deep Tensor Matrix</h2>
+          <span>AI Engine</span>
+        </figcaption>
+      </figure>
+
+      <!-- Image 5: Cybernetic Optic -->
+      <figure class="gallery-item" tabindex="0" role="button" aria-label="Open Cybernetic Optic in lightbox">
+        <img
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><rect width='800' height='600' fill='%23040711'/><path d='M120,300 Q400,110 680,300 Q400,490 120,300 Z' fill='%230f172a' stroke='%2338bdf8' stroke-width='4'/><circle cx='400' cy='300' r='105' fill='%231e1b4b' stroke='%23a855f7' stroke-width='4'/><circle cx='400' cy='300' r='68' fill='none' stroke='%2322d3ee' stroke-width='3' stroke-dasharray='14 6'/><circle cx='400' cy='300' r='34' fill='%2338bdf8'/><circle cx='414' cy='286' r='10' fill='%23ffffff'/></svg>"
+          alt="Bionic optical iris sensor with glowing cyan aperture and HUD targeting ring"
+        />
+        <figcaption class="caption">
+          <h2>Cybernetic Optic</h2>
+          <span>Prosthetics</span>
+        </figcaption>
+      </figure>
+
+      <!-- Image 6: Neuro-Quantum Core -->
+      <figure class="gallery-item" tabindex="0" role="button" aria-label="Open Neuro-Quantum Core in lightbox">
+        <img
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><defs><linearGradient id='n6' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%23090d1e'/><stop offset='100%25' stop-color='%231e1b4b'/></linearGradient></defs><rect width='800' height='600' fill='url(%23n6)'/><polygon points='400,115 560,208 560,392 400,485 240,392 240,208' fill='none' stroke='%2338bdf8' stroke-width='3.5'/><polygon points='400,175 508,238 508,362 400,425 292,362 292,238' fill='none' stroke='%23a855f7' stroke-width='3'/><circle cx='400' cy='300' r='42' fill='%2322d3ee' opacity='0.25'/><circle cx='400' cy='300' r='20' fill='%2338bdf8'/></svg>"
+          alt="Hexagonal neuromorphic quantum compute core emitting cyan resonance"
+        />
+        <figcaption class="caption">
+          <h2>Neuro-Quantum Core</h2>
+          <span>Compute</span>
+        </figcaption>
+      </figure>
+    </section>
+  </main>
+
+  <!-- Lightbox Overlay -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image Preview">
+    <button class="lb-btn lb-close" id="lbClose" aria-label="Close lightbox">&times;</button>
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous image">&#10094;</button>
+    <div class="lightbox-content">
+      <img id="lbImg" src="" alt="" />
+      <p class="lightbox-caption" id="lbCaption"></p>
+    </div>
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next image">&#10095;</button>
+  </div>
+
+  <script>
+    const items = Array.from(document.querySelectorAll(".gallery-item"));
+    const lightbox = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const lbCaption = document.getElementById("lbCaption");
+    const lbClose = document.getElementById("lbClose");
+    const lbPrev = document.getElementById("lbPrev");
+    const lbNext = document.getElementById("lbNext");
+
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      currentIndex = (index + items.length) % items.length;
+      const img = items[currentIndex].querySelector("img");
+      const title = items[currentIndex].querySelector("h2").textContent;
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lbCaption.textContent = `${title} (${currentIndex + 1} of ${items.length})`;
+      lightbox.classList.add("open");
+      lbClose.focus();
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      items[currentIndex].focus();
+    }
+
+    items.forEach((item, index) => {
+      item.addEventListener("click", () => openLightbox(index));
+      item.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openLightbox(index);
+        }
+      });
+    });
+
+    lbClose.addEventListener("click", closeLightbox);
+    lbPrev.addEventListener("click", () => openLightbox(currentIndex - 1));
+    lbNext.addEventListener("click", () => openLightbox(currentIndex + 1));
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("open")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") openLightbox(currentIndex - 1);
+      if (e.key === "ArrowRight") openLightbox(currentIndex + 1);
+    });
+  </script>
+</body>
+</html>
